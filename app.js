@@ -1,13 +1,18 @@
 const express = require("express");
 const path = require("path");
-const app = express();
 const morgan = require("morgan");
 const passport = require("passport");
 const expressSession = require("express-session");
 const expressHandleBars = require("express-handlebars");
+const dotenv = require("dotenv");
+const MongoStore = require("connect-mongo")(expressSession);
+const mongoose = require("mongoose");
+
+// Importing database file
 const connectDB = require("./config/db");
 
-const dotenv = require("dotenv");
+// Initializing express application
+const app = express();
 
 //Load config
 dotenv.config({ path: "./config/config.env" });
@@ -18,10 +23,10 @@ require("./config/passport")(passport);
 // Database connection
 connectDB();
 
-// static assets
+// static assets to make public folder a static folder
 app.use(express.static(path.join(__dirname, "public")));
 
-// Logging
+// For Logging of routes in development mode
 process.env.NODE_ENV === "development" ? app.use(morgan("dev")) : null;
 
 // Template
@@ -37,11 +42,13 @@ app.use(
     secret: "some secret",
     resave: false,
     saveUninitialized: false,
+    store: new MongoStore({ mongooseConnection: mongoose.connection }),
   })
 );
 
-// Passport middleware
+// Initializing Passport middleware
 app.use(passport.initialize());
+app.use(passport.session());
 
 //Routes
 app.use("/", require("./routes/index"));
