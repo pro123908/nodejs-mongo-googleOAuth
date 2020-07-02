@@ -14,6 +14,10 @@ const connectDB = require("./config/db");
 // Initializing express application
 const app = express();
 
+// Body parser
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
+
 //Load config
 dotenv.config({ path: "./config/config.env" });
 
@@ -29,10 +33,23 @@ app.use(express.static(path.join(__dirname, "public")));
 // For Logging of routes in development mode
 process.env.NODE_ENV === "development" ? app.use(morgan("dev")) : null;
 
+// handlebar helpers
+const {
+  formatDate,
+  stripTags,
+  truncate,
+  editIcon,
+  select,
+} = require("./helpers/hbs");
+
 // Template
 app.engine(
   ".hbs",
-  expressHandleBars({ defaultLayout: "main", extname: ".hbs" })
+  expressHandleBars({
+    helpers: { formatDate, stripTags, truncate, editIcon, select },
+    defaultLayout: "main",
+    extname: ".hbs",
+  })
 );
 app.set("view engine", ".hbs");
 
@@ -50,9 +67,16 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+// express global vars
+app.use(function (req, res, next) {
+  res.locals.user = req.user || null;
+  next();
+});
+
 //Routes
 app.use("/", require("./routes/index"));
 app.use("/auth", require("./routes/auth"));
+app.use("/stories", require("./routes/stories"));
 
 const PORT = process.env.PORT || 3001;
 

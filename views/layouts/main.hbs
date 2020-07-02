@@ -15,6 +15,7 @@
 <body>
 
     {{> _header}}
+    {{> _add_btn}}
     <div class="container">
         {{{body }}}
     </div>
@@ -22,8 +23,17 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ckeditor/4.14.1/ckeditor.js"
+        integrity="sha512-P4rrEImABBYtBFdmrFPqF8rjh8iiRiupfQ4KLrBCL8dAivLiM2nh+1bJQeMb2ZglmIlGZdfTtgGdXH6H/hGVeg=="
+        crossorigin="anonymous"></script>
+
     <script>
         M.Sidenav.init(document.querySelector('.sidenav'));
+        M.FormSelect.init(document.querySelector('#status'));
+
+        CKEDITOR.replace('body', {
+            plugins: 'wysiwygarea, toolbar, basicstyles, link'
+        })
     </script>
 </body>
 
