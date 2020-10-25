@@ -11,7 +11,7 @@ router.get("/add", ensureAuth, (req, res) => {
 });
 
 // @desc Process Add Form
-// @route GET /stories
+// @route POST /stories
 router.post("/", ensureAuth, async (req, res) => {
   try {
     req.body.user = req.user.id;
@@ -25,7 +25,7 @@ router.post("/", ensureAuth, async (req, res) => {
 
 // @desc Show All stories
 // @route GET /stories/
-router.get("/", ensureAuth, async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const stories = await Story.find({ status: "public" })
       .populate("user")
@@ -45,7 +45,7 @@ router.get("/", ensureAuth, async (req, res) => {
 // @route GET /stories/:id
 router.get("/:id", ensureAuth, async (req, res) => {
   try {
-    let story = await (await Story.findById(req.params.id))
+    let story = await await Story.findById(req.params.id)
       .populate("user")
       .lean();
 
@@ -71,6 +71,7 @@ router.get("/edit/:id", ensureAuth, async (req, res) => {
       return res.render("error/404");
     }
 
+    // To not allow any user to edit someone else story by url
     if (story.user != req.user.id) {
       res.redirect("/stories");
     } else {
